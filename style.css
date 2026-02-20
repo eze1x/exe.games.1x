@@ -24,7 +24,7 @@ body {
     align-items: center;
 }
 
-/* CONTENEDOR (CLAVE DEL FIX) */
+/* CONTENEDOR */
 .container {
     display: flex;
     flex-direction: column;
@@ -57,9 +57,12 @@ body {
         0 0 45px rgba(255, 0, 51, 0.6);
 }
 
-/* BOTÓN */
+/* BOTÓN (MISMO ANCHO QUE EL MENÚ) */
 .menu-btn {
-    padding: 18px 55px;
+    width: 100%;
+    max-width: 420px;
+
+    padding: 18px 0;
     font-size: 1.05rem;
     letter-spacing: 2px;
     font-weight: 700;
@@ -84,7 +87,7 @@ body {
     transform: scale(1.05);
 }
 
-/* MENÚ DE JUEGOS (AHORA REALMENTE CENTRADO) */
+/* MENÚ DE JUEGOS */
 .menu {
     margin-top: 35px;
 
