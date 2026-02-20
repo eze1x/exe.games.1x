@@ -15,8 +15,7 @@ html, body {
 /* BODY */
 body {
     min-height: 100vh;
-    background:
-        radial-gradient(circle at top, #2a0033 0%, #050008 70%);
+    background: radial-gradient(circle at top, #2a0033 0%, #050008 70%);
     font-family: 'Orbitron', sans-serif;
     color: #ffffff;
 
@@ -68,9 +67,7 @@ body {
     border-radius: 10px;
     cursor: pointer;
 
-    box-shadow:
-        0 0 15px rgba(255, 0, 51, 0.6);
-
+    box-shadow: 0 0 15px rgba(255, 0, 51, 0.6);
     transition: all 0.3s ease;
 }
 
@@ -83,11 +80,13 @@ body {
     transform: scale(1.05);
 }
 
-/* MENÚ */
+/* MENÚ (CENTRADO CORRECTAMENTE) */
 .menu {
-    margin-top: 40px;
-    padding: 30px;
+    margin-top: 35px;
+    margin-left: auto;
+    margin-right: auto;
 
+    padding: 30px;
     min-width: 320px;
     max-width: 420px;
 
@@ -96,9 +95,7 @@ body {
 
     background: rgba(10, 0, 15, 0.85);
 
-    box-shadow:
-        0 0 25px rgba(199, 125, 255, 0.7);
-
+    box-shadow: 0 0 25px rgba(199, 125, 255, 0.7);
     animation: menuFade 0.35s ease;
 }
 
