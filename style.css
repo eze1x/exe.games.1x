@@ -24,8 +24,12 @@ body {
     align-items: center;
 }
 
-/* CONTENEDOR */
+/* CONTENEDOR (CLAVE DEL FIX) */
 .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
     text-align: center;
     padding: 40px;
 }
@@ -80,14 +84,12 @@ body {
     transform: scale(1.05);
 }
 
-/* MENÚ (CENTRADO CORRECTAMENTE) */
+/* MENÚ DE JUEGOS (AHORA REALMENTE CENTRADO) */
 .menu {
     margin-top: 35px;
-    margin-left: auto;
-    margin-right: auto;
 
     padding: 30px;
-    min-width: 320px;
+    width: 100%;
     max-width: 420px;
 
     border: 2px solid #c77dff;
