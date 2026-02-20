@@ -10,11 +10,22 @@
 
 <main class="game-container">
 
+    <div class="top-bar">
+        <a href="../index.html" class="back-btn">⬅ Volver al menú</a>
+        <div class="difficulty" id="difficultyText">ELO: 600</div>
+    </div>
+
     <h1 class="title">exe.games<span>.1x</span></h1>
 
-    <div id="board" class="board"></div>
+    <div class="difficulty-menu">
+        <button data-elo="600">Fácil · 600</button>
+        <button data-elo="1200">Intermedio · 1200</button>
+        <button data-elo="2000">Difícil · 2000</button>
+    </div>
 
-    <p class="turn" id="turnText">Turno: Blancas</p>
+    <div id="board" class="board hidden"></div>
+
+    <p class="turn hidden" id="turnText">Turno: Blancas</p>
 
 </main>
 
