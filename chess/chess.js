@@ -25,12 +25,15 @@ let board = [
 ];
 
 let moved = {
-    whiteKing: false, blackKing: false,
-    whiteRookA: false, whiteRookH: false,
-    blackRookA: false, blackRookH: false
+    whiteKing: false,
+    blackKing: false,
+    whiteRookA: false,
+    whiteRookH: false,
+    blackRookA: false,
+    blackRookH: false
 };
 
-/* INICIO */
+/* ========= INICIO ========= */
 difficultyBtns.forEach(btn => {
     btn.onclick = () => {
         document.querySelector(".difficulty-menu").classList.add("hidden");
@@ -40,6 +43,7 @@ difficultyBtns.forEach(btn => {
     };
 });
 
+/* ========= RENDER ========= */
 function drawBoard() {
     boardEl.innerHTML = "";
     board.forEach((row, y) => {
@@ -62,6 +66,7 @@ function drawBoard() {
     });
 }
 
+/* ========= INPUT ========= */
 function handleClick(x, y) {
     if (gameOver) return;
 
@@ -93,13 +98,13 @@ function handleClick(x, y) {
     highlightMoves(x, y);
 }
 
-/* ================= MOVES ================= */
-
+/* ========= MOVIMIENTO REAL ========= */
 function makeMove(fx, fy, tx, ty) {
     const piece = board[fy][fx];
 
     // EN PASSANT
-    if (piece.toLowerCase() === "p" && enPassant && tx === enPassant.x && ty === enPassant.y) {
+    if (piece.toLowerCase() === "p" && enPassant &&
+        tx === enPassant.x && ty === enPassant.y) {
         const dir = isWhite(piece) ? 1 : -1;
         board[ty + dir] = replaceChar(board[ty + dir], tx, ".");
     }
@@ -118,19 +123,29 @@ function makeMove(fx, fy, tx, ty) {
         }
     }
 
+    // FLAGS
+    if (piece === "K") moved.whiteKing = true;
+    if (piece === "k") moved.blackKing = true;
+    if (piece === "R" && fx === 0) moved.whiteRookA = true;
+    if (piece === "R" && fx === 7) moved.whiteRookH = true;
+    if (piece === "r" && fx === 0) moved.blackRookA = true;
+    if (piece === "r" && fx === 7) moved.blackRookH = true;
+
+    // EN PASSANT FLAG
     enPassant = null;
     if (piece.toLowerCase() === "p" && Math.abs(ty - fy) === 2) {
         enPassant = { x: fx, y: (fy + ty) / 2 };
     }
 }
 
+/* ========= POST MOVE ========= */
 function afterMove() {
     currentTurn = currentTurn === "white" ? "black" : "white";
     turnText.textContent = `Turno: ${currentTurn === "white" ? "Blancas" : "Negras"}`;
 
     if (isCheckMate(currentTurn)) {
         gameOver = true;
-        statusText.textContent = `JAQUE MATE`;
+        statusText.textContent = "JAQUE MATE";
     } else if (isInCheck(currentTurn)) {
         statusText.textContent = "JAQUE";
     } else {
@@ -138,21 +153,25 @@ function afterMove() {
     }
 }
 
-/* ================= RULES ================= */
-
+/* ========= VALIDACIÓN ========= */
 function isLegalMove(fx, fy, tx, ty) {
     if (!basicMoveAllowed(fx, fy, tx, ty)) return false;
 
-    const backup = board.map(r => r);
-    const backupEP = enPassant && { ...enPassant };
+    const copyBoard = board.map(r => r);
+    const copyEP = enPassant && { ...enPassant };
 
-    makeMove(fx, fy, tx, ty);
-    const illegal = isInCheck(isWhite(board[ty][tx]) ? "white" : "black");
+    simulateMove(fx, fy, tx, ty);
+    const illegal = isInCheck(currentTurn);
 
-    board = backup;
-    enPassant = backupEP;
+    board = copyBoard;
+    enPassant = copyEP;
 
     return !illegal;
+}
+
+function simulateMove(fx, fy, tx, ty) {
+    board[ty] = replaceChar(board[ty], tx, board[fy][fx]);
+    board[fy] = replaceChar(board[fy], fx, ".");
 }
 
 function basicMoveAllowed(fx, fy, tx, ty) {
@@ -168,36 +187,34 @@ function basicMoveAllowed(fx, fy, tx, ty) {
     switch (piece.toLowerCase()) {
         case "p": {
             const dir = isWhite(piece) ? -1 : 1;
+            const start = isWhite(piece) ? 6 : 1;
+
             if (dx === 0 && dy === dir && target === ".") return true;
-            if (Math.abs(dx) === 1 && dy === dir && (target !== "." || enPassant?.x === tx)) return true;
+            if (dx === 0 && dy === 2 * dir && fy === start &&
+                board[fy + dir][fx] === "." && target === ".") return true;
+            if (Math.abs(dx) === 1 && dy === dir &&
+                (target !== "." || enPassant?.x === tx)) return true;
             return false;
         }
         case "r": return clearPath(fx, fy, tx, ty) && (dx === 0 || dy === 0);
         case "b": return clearPath(fx, fy, tx, ty) && Math.abs(dx) === Math.abs(dy);
-        case "q": return clearPath(fx, fy, tx, ty) && (dx === 0 || dy === 0 || Math.abs(dx) === Math.abs(dy));
+        case "q": return clearPath(fx, fy, tx, ty);
         case "n": return Math.abs(dx * dy) === 2;
-        case "k": return Math.abs(dx) <= 1 && Math.abs(dy) <= 1 || isCastling(fx, fy, tx);
+        case "k": return Math.abs(dx) <= 1 && Math.abs(dy) <= 1 || canCastle(fx, fy, tx);
     }
     return false;
 }
 
-function isCastling(fx, fy, tx) {
-    return Math.abs(tx - fx) === 2;
-}
+function canCastle(fx, fy, tx) {
+    if (Math.abs(tx - fx) !== 2) return false;
 
-function clearPath(fx, fy, tx, ty) {
-    const dx = Math.sign(tx - fx);
-    const dy = Math.sign(ty - fy);
-    let x = fx + dx, y = fy + dy;
-    while (x !== tx || y !== ty) {
-        if (board[y][x] !== ".") return false;
-        x += dx; y += dy;
-    }
+    if (currentTurn === "white" && moved.whiteKing) return false;
+    if (currentTurn === "black" && moved.blackKing) return false;
+
     return true;
 }
 
-/* ================= CHECK ================= */
-
+/* ========= CHECK ========= */
 function isInCheck(color) {
     let kx, ky;
     board.forEach((r, y) =>
@@ -227,6 +244,18 @@ function isCheckMate(color) {
                     for (let tx = 0; tx < 8; tx++)
                         if (isLegalMove(x, y, tx, ty)) return false;
 
+    return true;
+}
+
+/* ========= HELPERS ========= */
+function clearPath(fx, fy, tx, ty) {
+    const dx = Math.sign(tx - fx);
+    const dy = Math.sign(ty - fy);
+    let x = fx + dx, y = fy + dy;
+    while (x !== tx || y !== ty) {
+        if (board[y][x] !== ".") return false;
+        x += dx; y += dy;
+    }
     return true;
 }
 
