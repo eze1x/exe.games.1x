@@ -127,3 +127,12 @@ body {
 .hidden {
     display: none;
 }
+
+/* (todo lo tuyo se mantiene igual, solo agrego esto abajo) */
+
+#statusText {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #ff0033;
+    text-shadow: 0 0 10px #ff0033;
+}
