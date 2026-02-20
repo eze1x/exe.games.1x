@@ -57,7 +57,7 @@ body {
         0 0 45px rgba(255, 0, 51, 0.6);
 }
 
-/* BOTÓN (MISMO ANCHO QUE EL MENÚ) */
+/* BOTÓN */
 .menu-btn {
     width: 100%;
     max-width: 420px;
@@ -87,11 +87,11 @@ body {
     transform: scale(1.05);
 }
 
-/* MENÚ DE JUEGOS */
+/* MENÚ */
 .menu {
     margin-top: 35px;
 
-    padding: 30px;
+    padding: 25px;
     width: 100%;
     max-width: 420px;
 
@@ -102,12 +102,39 @@ body {
 
     box-shadow: 0 0 25px rgba(199, 125, 255, 0.7);
     animation: menuFade 0.35s ease;
+
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-.menu-placeholder {
+/* ITEM DE JUEGO */
+.game-item {
+    text-decoration: none;
     color: #c77dff;
-    font-size: 0.95rem;
-    opacity: 0.85;
+
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(199,125,255,0.4);
+
+    box-shadow: 0 0 10px rgba(199,125,255,0.4);
+    transition: all 0.25s ease;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.game-item:hover {
+    background: rgba(199,125,255,0.15);
+    box-shadow: 0 0 25px rgba(199,125,255,0.8);
+    transform: scale(1.03);
+}
+
+.game-sub {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-top: 6px;
 }
 
 /* OCULTO */
