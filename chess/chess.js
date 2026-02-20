@@ -1,8 +1,11 @@
 const boardEl = document.getElementById("board");
 const turnText = document.getElementById("turnText");
+const difficultyText = document.getElementById("difficultyText");
+const difficultyBtns = document.querySelectorAll(".difficulty-menu button");
 
 let selected = null;
 let currentTurn = "white";
+let elo = 600;
 
 const pieces = {
     r: "♜", n: "♞", b: "♝", q: "♛", k: "♚", p: "♟",
@@ -19,6 +22,18 @@ let board = [
     "PPPPPPPP",
     "RNBQKBNR"
 ];
+
+/* SELECCIÓN DE DIFICULTAD */
+difficultyBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+        elo = btn.dataset.elo;
+        difficultyText.textContent = `ELO: ${elo}`;
+        document.querySelector(".difficulty-menu").classList.add("hidden");
+        boardEl.classList.remove("hidden");
+        turnText.classList.remove("hidden");
+        drawBoard();
+    });
+});
 
 function drawBoard() {
     boardEl.innerHTML = "";
@@ -37,7 +52,7 @@ function drawBoard() {
                 square.appendChild(piece);
             }
 
-            square.addEventListener("click", () => handleClick(x, y));
+            square.onclick = () => handleClick(x, y);
             boardEl.appendChild(square);
         });
     });
@@ -45,7 +60,6 @@ function drawBoard() {
 
 function handleClick(x, y) {
     clearHighlights();
-
     const piece = board[y][x];
 
     if (selected) {
@@ -72,31 +86,26 @@ function highlightMoves(x, y) {
         const tx = +sq.dataset.x;
         const ty = +sq.dataset.y;
 
-        if (isLegalMove(x, y, tx, ty)) {
-            sq.classList.add("move");
-        }
-
-        if (tx === x && ty === y) {
-            sq.classList.add("selected");
-        }
+        if (isLegalMove(x, y, tx, ty)) sq.classList.add("move");
+        if (tx === x && ty === y) sq.classList.add("selected");
     });
 }
 
 function clearHighlights() {
-    document.querySelectorAll(".square").forEach(sq => {
-        sq.classList.remove("move", "selected");
-    });
+    document.querySelectorAll(".square").forEach(sq =>
+        sq.classList.remove("move", "selected")
+    );
 }
 
 function movePiece(fx, fy, tx, ty) {
-    const row = board[fy].split("");
-    const targetRow = board[ty].split("");
+    const from = board[fy].split("");
+    const to = board[ty].split("");
 
-    targetRow[tx] = row[fx];
-    row[fx] = ".";
+    to[tx] = from[fx];
+    from[fx] = ".";
 
-    board[fy] = row.join("");
-    board[ty] = targetRow.join("");
+    board[fy] = from.join("");
+    board[ty] = to.join("");
 }
 
 function switchTurn() {
@@ -104,24 +113,37 @@ function switchTurn() {
     turnText.textContent = `Turno: ${currentTurn === "white" ? "Blancas" : "Negras"}`;
 }
 
-/* MOVIMIENTOS LEGALES BÁSICOS */
+/* MOVIMIENTOS LEGALES */
 function isLegalMove(fx, fy, tx, ty) {
     if (fx === tx && fy === ty) return false;
 
     const piece = board[fy][fx];
     const target = board[ty][tx];
-
     const isWhite = piece === piece.toUpperCase();
+
     if (target !== "." && (target === target.toUpperCase()) === isWhite) return false;
 
     const dx = tx - fx;
     const dy = ty - fy;
 
     switch (piece.toLowerCase()) {
-        case "p":
+        case "p": {
             const dir = isWhite ? -1 : 1;
+            const startRow = isWhite ? 6 : 1;
+
             if (dx === 0 && dy === dir && target === ".") return true;
+
+            if (
+                dx === 0 && dy === dir * 2 &&
+                fy === startRow &&
+                board[fy + dir][fx] === "." &&
+                target === "."
+            ) return true;
+
+            if (Math.abs(dx) === 1 && dy === dir && target !== ".") return true;
+
             return false;
+        }
 
         case "r":
             return dx === 0 || dy === 0;
@@ -140,5 +162,3 @@ function isLegalMove(fx, fy, tx, ty) {
     }
     return false;
 }
-
-drawBoard();
